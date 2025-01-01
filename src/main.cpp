@@ -1,5 +1,5 @@
 #include "Services/RconClient.h"
-#include "Services/SettingsReader.h"
+#include "Services/SettingsContainer.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/log/expressions.hpp>
@@ -56,39 +56,43 @@ int main(int argc, char** argv) {
   }
 
   RconClient rconClient;
-  SettingsReader settingsReader;
+  SettingsContainer settingsContainer;
   std::string host, password;
   std::uint16_t port;
   std::string command;
 
-  if (!variablesMap.count("command")) {
-    printHelp(argv[0], options);
-    return 1;
-  }
-  command = variablesMap["command"].as<std::string>();
+  try {
+    settingsContainer.readOrCreateDefault();
 
-  if (variablesMap.count("profile")) {
-    const auto profileName = variablesMap["profile"].as<std::string>();
-    if (!settingsReader.settings().profiles.contains(profileName)) {
-      std::cerr << std::format("Profile \"{}\" does not exists.", profileName);
+    if (!variablesMap.count("command")) {
+      printHelp(argv[0], options);
       return 1;
     }
-    const Profile profile = settingsReader.settings().profiles.at(profileName);
-    host = profile.host;
-    port = profile.port;
-    password = profile.password;
-  } else if (variablesMap.count("host") == 1 &&
-             variablesMap.count("port") == 1 &&
-             variablesMap.count("password") == 1) {
-    host = variablesMap["host"].as<std::string>();
-    port = std::atoi(variablesMap["port"].as<std::string>().c_str());
-    password = variablesMap["password"].as<std::string>();
-  } else {
-    printHelp(argv[0], options);
-    return 1;
-  }
+    command = variablesMap["command"].as<std::string>();
 
-  try {
+    if (variablesMap.count("profile")) {
+      const auto profileName = variablesMap["profile"].as<std::string>();
+      if (!settingsContainer.settings().profiles.contains(profileName)) {
+        std::cerr << std::format("Profile \"{}\" does not exists.",
+                                 profileName);
+        return 1;
+      }
+      const Profile profile =
+          settingsContainer.settings().profiles.at(profileName);
+      host = profile.host;
+      port = profile.port;
+      password = profile.password;
+    } else if (variablesMap.count("host") == 1 &&
+               variablesMap.count("port") == 1 &&
+               variablesMap.count("password") == 1) {
+      host = variablesMap["host"].as<std::string>();
+      port = std::atoi(variablesMap["port"].as<std::string>().c_str());
+      password = variablesMap["password"].as<std::string>();
+    } else {
+      printHelp(argv[0], options);
+      return 1;
+    }
+
     rconClient.connect(host, port, password);
     std::cout << rconClient.sendCommand(command);
   } catch (const std::exception& ex) {

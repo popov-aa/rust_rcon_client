@@ -7,7 +7,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/Services/SettingsReader.cpp
+add_executable(${PROJECT_NAME} src/main.cpp src/Services/SettingsContainer.cpp
                                src/Services/RconClient.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
