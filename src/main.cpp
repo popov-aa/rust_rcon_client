@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Services/RconClient.h"
 #include "Services/SettingsContainer.h"
 
@@ -31,12 +32,11 @@ Usage:
 
 int main(int argc, char** argv) {
 
-  boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::info);
-
   boost::program_options::options_description options("Allowed options");
   options.add_options()                                                       //
       ("help", "Produce help message")                                        //
+      ("version", "Version")                                                  //
+      ("verbose", "Verbose mode")                                             //
       ("host", boost::program_options::value<std::string>(), "Host")          //
       ("port", boost::program_options::value<std::string>(), "Port")          //
       ("password", boost::program_options::value<std::string>(), "Password")  //
@@ -53,6 +53,16 @@ int main(int argc, char** argv) {
   if (variablesMap.size() == 0 || variablesMap.count("help")) {
     printHelp(argv[0], options);
     return 1;
+  }
+
+  if (variablesMap.count("version")) {
+    std::cout << "Version: " << VERSION << std::endl;
+    return 1;
+  }
+
+  if (!variablesMap.count("verbose")) {
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >=
+                                        boost::log::trivial::info);
   }
 
   RconClient rconClient;

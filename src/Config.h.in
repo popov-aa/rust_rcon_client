@@ -1,0 +1,4 @@
+#define VERSION_MAJOR @rust_rcon_client_VERSION_MAJOR@
+#define VERSION_MINOR @rust_rcon_client_VERSION_MINOR@
+#define VERSION_PATCH @rust_rcon_client_VERSION_PATCH@
+#define VERSION "@rust_rcon_client_VERSION_MAJOR@.@rust_rcon_client_VERSION_MINOR@.@rust_rcon_client_VERSION_PATCH@"
